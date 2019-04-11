@@ -99,3 +99,6 @@ lint/tmp/
 gen-external-apklibs
 output.json
 
+.idea/runConfigurations.xml
+.idea/misc.xml
+.idea/codeStyles/Project.xml
