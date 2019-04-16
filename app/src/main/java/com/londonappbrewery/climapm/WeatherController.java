@@ -1,6 +1,7 @@
 package com.londonappbrewery.climapm;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -10,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -37,7 +39,7 @@ public class WeatherController extends AppCompatActivity
     final float MIN_DISTANCE = 1000;
 
     // TODO: Set LOCATION_PROVIDER here:
-    String LOCATION_PROVIDER = LocationManager.GPS_PROVIDER;
+    String LOCATION_PROVIDER = LocationManager.NETWORK_PROVIDER;
 
 
     private static final String TAG = "Clima";
@@ -67,6 +69,15 @@ public class WeatherController extends AppCompatActivity
 
 
         // TODO: Add an OnClickListener to the changeCityButton here:
+        changeCityButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                Intent intent = new Intent(WeatherController.this, ChangeCityController.class);
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -79,7 +90,40 @@ public class WeatherController extends AppCompatActivity
         super.onResume();
         Log.d("Clima", "onResume: called");
         Log.d("Clima", "Getting weather for location");
-        getWeatherForCurrentLocation();
+
+        Intent intent = getIntent();
+        String city = intent.getStringExtra("city");
+
+        if (city != null)
+        {
+            getWeatherForNewCity(city);
+        }
+        else
+        {            
+            getWeatherForCurrentLocation();
+        }
+
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+
+        if (m_locationManager != null)
+        {
+            m_locationManager.removeUpdates(m_locationListener);
+        }
+    }
+
+    private void getWeatherForNewCity(String city)
+    {
+        RequestParams params = new RequestParams();
+
+        params.put("q", city);
+        params.put("appid", APP_ID);
+
+        letsDoSomeNetworking(params);
     }
 
 
